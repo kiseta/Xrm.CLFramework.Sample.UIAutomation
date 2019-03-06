@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using Microsoft.Dynamics365.UIAutomation.Api;
-using System.Linq;
 using OpenQA.Selenium;
 
 namespace Xrm.CLFramework.Sample.UIAutomation
@@ -12,7 +11,9 @@ namespace Xrm.CLFramework.Sample.UIAutomation
 	[TestClass]
 	public class CreateContactTest
 	{
-		private readonly SecureString _username = Environment.GetEnvironmentVariable("CRMUser", EnvironmentVariableTarget.User).ToSecureString();
+	    private static TestContext _testContext;
+
+        private readonly SecureString _username = Environment.GetEnvironmentVariable("CRMUser", EnvironmentVariableTarget.User).ToSecureString();
 		private readonly SecureString _password = Environment.GetEnvironmentVariable("CRMPassword", EnvironmentVariableTarget.User).ToSecureString();
 		private readonly Uri _xrmUri = new Uri(Environment.GetEnvironmentVariable("CRMUrl", EnvironmentVariableTarget.User));
 
@@ -23,7 +24,13 @@ namespace Xrm.CLFramework.Sample.UIAutomation
 			FireEvents = true
 		};
 
-		[TestMethod]
+	    [ClassInitialize]
+	    public static void SetupContext(TestContext testContext)
+	    {
+	        _testContext = testContext;
+	    }
+
+	    [TestMethod]
 		public void CreateContact()
 		{
 
@@ -55,9 +62,9 @@ namespace Xrm.CLFramework.Sample.UIAutomation
 				xrmBrowser.Entity.SetValue(new OptionSet { Name = "preferredcontactmethodcode", Value = "Email" });
 				xrmBrowser.CommandBar.ClickCommand("Save");
 				xrmBrowser.ThinkTime(5000);
-				string screenShot = string.Format("{0}\\CreateNewContact.png", TestContext.TestResultsDirectory);
+				string screenShot = string.Format("{0}\\CreateNewContact.png", _testContext.TestResultsDirectory);
 				xrmBrowser.TakeWindowScreenShot(screenShot, ScreenshotImageFormat.Png);
-				TestContext.AddResultFile(screenShot);
+				_testContext.AddResultFile(screenShot);
 			}
 
 		}
